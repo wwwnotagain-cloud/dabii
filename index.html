@@ -1,0 +1,56 @@
+export default {
+  async fetch(request, env, ctx) {
+    const userAgent = request.headers.get('user-agent') || '';
+    
+    // 🔗 YOUR LINK - Aapka bataya hua link lagaya hai
+    const targetLink = "https://markswaitingrouge.com/gpeixuy44e?key=fb5f083d6d407041b969e9429d39ab9d";
+    
+    // 🖼️ YOUR IMAGE - Photo same rakhi hai
+    const thumbnailImage = "https://i.ibb.co/YF8q8cZF/image.jpg";
+    
+    // 📝 Customize karein
+    const pageTitle = "Click Here to Watch";
+    const pageDescription = "Trending updates.";
+
+    // Social media crawlers detection
+    const socialCrawlers = [
+      'facebookexternalhit', 'Facebot', 'Twitterbot', 
+      'Pinterestbot', 'LinkedInBot', 'Slackbot', 
+      'WhatsApp', 'TelegramBot', 'SkypeUriPreview'
+    ];
+    
+    if (socialCrawlers.some(crawler => userAgent.includes(crawler))) {
+      const html = `<!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta property="og:title" content="${pageTitle}" />
+            <meta property="og:description" content="${pageDescription}" />
+            <meta property="og:image" content="${thumbnailImage}" />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="${targetLink}" />
+            <meta property="og:site_name" content="${pageTitle}" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="${pageTitle}" />
+            <meta name="twitter:description" content="${pageDescription}" />
+            <meta name="twitter:image" content="${thumbnailImage}" />
+            <meta http-equiv="refresh" content="0; url=${targetLink}" />
+          </head>
+          <body>
+            <img src="${thumbnailImage}" alt="${pageTitle}" style="display:none;">
+            <a href="${targetLink}">Click here</a>
+          </body>
+        </html>`;
+      
+      return new Response(html, { 
+        headers: { 
+          'content-type': 'text/html',
+          'Cache-Control': 'public, max-age=3600'
+        } 
+      });
+    }
+
+    // Normal users - direct redirect
+    return Response.redirect(targetLink, 302);
+  },
+};
